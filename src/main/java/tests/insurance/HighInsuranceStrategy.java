@@ -16,7 +16,7 @@ public class HighInsuranceStrategy extends InsuranceStrategy {
     }
 
     @Override
-    int getAdjustment() {
+    protected  int getAdjustment() {
         return 30000;
     }
 }
