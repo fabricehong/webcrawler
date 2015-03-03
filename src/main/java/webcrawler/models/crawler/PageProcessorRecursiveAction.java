@@ -8,6 +8,8 @@ import org.htmlparser.Parser;
 import org.htmlparser.tags.LinkTag;
 import org.htmlparser.util.NodeList;
 import org.htmlparser.util.ParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webcrawler.models.parsing.PageDom;
 import webcrawler.models.tasks.PageDomTask;
 
@@ -17,6 +19,7 @@ import webcrawler.models.tasks.PageDomTask;
  */
 public class PageProcessorRecursiveAction extends RecursiveAction {
 
+    private Logger logger = LoggerFactory.getLogger(PageProcessorRecursiveAction.class);
     private String url;
     private LinkCrawlingState linkCrawlingState;
     private String fromUrl;
@@ -50,7 +53,7 @@ public class PageProcessorRecursiveAction extends RecursiveAction {
                 //invoke recursively
                 invokeAll(actions);
             } catch (Exception e) {
-                //ignore 404, unknown protocol or other server errors
+                logger.error(String.format("error while visiting url '%s'", url), e);
             }
         }
     }
