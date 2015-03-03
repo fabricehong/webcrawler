@@ -1,6 +1,6 @@
 package webcrawler;
 
-import webcrawler.view.ControlFrameView;
+import webcrawler.view.OpenUrlView;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,7 +20,7 @@ public class Main {
     }
 
     private static void startCrawlerGui() {
-        new ControlFrameView();
+        new OpenUrlView();
     }
 
 }

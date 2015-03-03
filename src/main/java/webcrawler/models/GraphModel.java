@@ -83,7 +83,7 @@ public abstract class GraphModel implements NewLinkListener {
         return graphWrapper.getGraph();
     }
 
-    public void addTrucListener(GraphEventListener graphEventListener) {
+    public void addGraphEventListener(GraphEventListener graphEventListener) {
         this.graphEventListenerList.add(graphEventListener);
     }
 

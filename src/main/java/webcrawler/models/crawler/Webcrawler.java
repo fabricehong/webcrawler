@@ -1,67 +1,38 @@
 package webcrawler.models.crawler;
 
 import webcrawler.models.listeners.NewLinkListener;
+import webcrawler.models.tasks.PageDomTask;
 
-import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 
 /**
  *
  * @author Madalin Ilie
  */
-public class Webcrawler implements LinkHandler {
+public class Webcrawler {
 
 
-    private final Collection<String> visitedLinks = Collections.synchronizedSet(new HashSet<String>());
-    //    private final Collection<String> visitedLinks = Collections.synchronizedList(new ArrayList<>());
-    private String url;
+    public static final String START_URL = "start";
+    private String startURl;
     private ForkJoinPool mainPool;
-    private List<NewLinkListener> newLinkListeners;
+    private LinkCrawlingState linkCrawlingState;
+    private PageDomTask pageDomTask;
 
-    public Webcrawler(String startingURL, int maxThreads) {
-        this.url = startingURL;
+
+    public Webcrawler(PageDomTask pageDomTask, String startUrl, int maxThreads) {
+        this.pageDomTask = pageDomTask;
+        this.startURl = startUrl;
         mainPool = new ForkJoinPool(maxThreads);
-        this.newLinkListeners = new ArrayList<NewLinkListener>();
-
-
+        linkCrawlingState = new LinkCrawlingState();
     }
 
     public void startCrawling() {
-        mainPool.invoke(new LinkFinderAction("start", this.url, this));
-    }
-
-    @Override
-    public void queueLink(String link) throws Exception {
-        System.out.println("yo");
-    }
-
-    @Override
-    public int size() {
-        return visitedLinks.size();
-    }
-
-    @Override
-    public void addVisited(String toLink) {
-        System.out.println("visited : " + toLink);
-        visitedLinks.add(toLink);
-
-    }
-
-    @Override
-    public void newConnection(String fromLink, String toLink) {
-        System.out.println("connection : " + fromLink + " - "  + toLink);
-        for (NewLinkListener listener : newLinkListeners) {
-            listener.onNewLink(fromLink, toLink);
-        }
-    }
-
-    @Override
-    public boolean visited(String s) {
-        return visitedLinks.contains(s);
+        PageProcessorRecursiveAction start = new PageProcessorRecursiveAction(pageDomTask, START_URL, this.startURl, linkCrawlingState);
+        mainPool.invoke(start);
     }
 
     public void addNewLinkListener(NewLinkListener listener) {
-        this.newLinkListeners.add(listener);
+        this.linkCrawlingState.addNewLinkListener(listener);
     }
 
     public void stopCrawling() {

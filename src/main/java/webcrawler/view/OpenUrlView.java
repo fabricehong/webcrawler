@@ -1,14 +1,17 @@
 package webcrawler.view;
 
 import webcrawler.models.GraphModel;
-import webcrawler.models.LinkModelImpl;
 import webcrawler.models.WebSiteModelImpl;
 import webcrawler.models.crawler.Webcrawler;
-import webcrawler.view.prefuse.WebsiteView;
+import webcrawler.models.exceptions.TechnicalException;
+import webcrawler.models.tasks.LearnTextsTask;
+import webcrawler.models.tasks.PageDomTask;
+import webcrawler.view.prefuse.WebCrawlingView;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,19 +20,16 @@ import java.awt.event.*;
  * Time: 15:26
  * To change this template use File | Settings | File Templates.
  */
-public class ControlFrameView extends JFrame {
+public class OpenUrlView extends JFrame {
 
     private JButton goButton;
     private JTextField textField;
     private Webcrawler webcrawler = null;
 
 
-    public ControlFrameView() throws HeadlessException {
-
-
+    public OpenUrlView() throws HeadlessException {
         initGUI();
         initListeners();
-
     }
 
     private void initGUI() {
@@ -39,7 +39,6 @@ public class ControlFrameView extends JFrame {
         contentPane.setLayout(new FlowLayout());
         textField = new JTextField("http://www.javaworld.com");
         contentPane.add(textField);
-
 
         goButton = new JButton("Go");
         contentPane.add(goButton);
@@ -75,9 +74,15 @@ public class ControlFrameView extends JFrame {
     }
 
     private void startCrawling() {
-        webcrawler = new Webcrawler(textField.getText(), 4);
+        PageDomTask learnTextsTask = null;
+        try {
+            learnTextsTask = new LearnTextsTask("/home/fabrice/log.log");
+        } catch (IOException e) {
+            throw new TechnicalException(e);
+        }
+        webcrawler = new Webcrawler(learnTextsTask, textField.getText(), 4);
         GraphModel graphModel = new WebSiteModelImpl(webcrawler);
-        new WebsiteView(graphModel, webcrawler);
+        new WebCrawlingView(graphModel, webcrawler);
 
 
 

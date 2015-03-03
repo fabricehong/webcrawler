@@ -16,16 +16,16 @@ import java.awt.event.WindowEvent;
  * Time: 15:26
  * To change this template use File | Settings | File Templates.
  */
-public class WebsiteView extends JFrame implements GraphEventListener {
+public class WebCrawlingView extends JFrame implements GraphEventListener {
 
     private GraphModel model;
     private PrefuseGraphDisplay prefuseGraphDisplay;
     private int lalu = 0;
 
-    public WebsiteView(GraphModel model, final Webcrawler webcrawler) throws HeadlessException {
+    public WebCrawlingView(GraphModel model, final Webcrawler webcrawler) throws HeadlessException {
 
         this.model = model;
-        this.model.addTrucListener(this);
+        this.model.addGraphEventListener(this);
 
         initGUI();
 
