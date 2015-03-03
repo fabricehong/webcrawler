@@ -42,11 +42,21 @@
           <version>beta-20071021</version>
       </dependency>
 
+      <!-- parser -->
       <dependency>
-          <groupId>org.htmlparser</groupId>
-          <artifactId>htmlparser</artifactId>
-          <version>1.6</version>
+          <groupId>org.jsoup</groupId>
+          <artifactId>jsoup</artifactId>
+          <version>1.8.1</version>
       </dependency>
+
+      <!-- tools -->
+      <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+          <version>3.3.2</version>
+      </dependency>
+
+
 
 
       <dependency>

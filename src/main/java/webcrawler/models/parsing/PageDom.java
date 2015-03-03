@@ -1,10 +1,9 @@
 package webcrawler.models.parsing;
 
-import org.htmlparser.Parser;
-import org.htmlparser.filters.NodeClassFilter;
-import org.htmlparser.tags.LinkTag;
-import org.htmlparser.util.NodeList;
-import org.htmlparser.util.ParserException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.net.URL;
@@ -18,14 +17,34 @@ import java.net.URL;
  */
 public class PageDom {
 
-    private Parser parser;
-    public PageDom(String url) throws IOException, ParserException {
+    private final Document doc;
+
+    public PageDom(String url) throws IOException {
         URL uriLink = new URL(url);
-        this.parser =  new Parser(uriLink.openConnection());
+        doc = Jsoup.parse(uriLink, 5000);
     }
 
 
-    public NodeList getTags(Class<?> tagType) throws ParserException {
-        return this.parser.extractAllNodesThatMatch(new NodeClassFilter(tagType));
+    public Elements getLinks() {
+        Elements links = doc.select("a");
+        return links;
+    }
+
+    public Elements getParagraphs() {
+        Elements paragraphs = doc.select("p");
+        return paragraphs;
+    }
+
+    public String getPageTitle() {
+        Elements head = doc.select("head");
+        if (head.size()!=1) {
+            return "body?";
+        }
+        Element element = head.get(0);
+        Elements title = element.getElementsByTag("title");
+        if (title.size()!=1) {
+            return "title?";
+        }
+        return title.get(0).text();
     }
 }

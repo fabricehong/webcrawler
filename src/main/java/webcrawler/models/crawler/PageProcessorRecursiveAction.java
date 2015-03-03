@@ -1,17 +1,16 @@
 package webcrawler.models.crawler;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.RecursiveAction;
-import org.htmlparser.Parser;
-import org.htmlparser.tags.LinkTag;
-import org.htmlparser.util.NodeList;
-import org.htmlparser.util.ParserException;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webcrawler.models.parsing.PageDom;
 import webcrawler.models.tasks.PageDomTask;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.RecursiveAction;
 
 /**
  *
@@ -38,13 +37,14 @@ public class PageProcessorRecursiveAction extends RecursiveAction {
 
     @Override
     public void compute() {
-        linkCrawlingState.newConnection(fromUrl, url);
         if (!linkCrawlingState.visited(url)) {
             try {
                 PageDom pageDom = new PageDom(url);
+                linkCrawlingState.newConnection(fromUrl, url, pageDom.getPageTitle());
                 pageDomTask.doTask(pageDom);
-                NodeList linkTags = pageDom.getTags(LinkTag.class);
-                List<RecursiveAction> actions = generateNextActions(linkTags);
+                Elements links = pageDom.getLinks();
+//                NodeList linkTags = pageDom.getTags(LinkTag.class);
+                List<RecursiveAction> actions = generateNextActions(links);
                 linkCrawlingState.addVisited(url);
 
                 if (linkCrawlingState.size() == 1500) {
@@ -58,15 +58,14 @@ public class PageProcessorRecursiveAction extends RecursiveAction {
         }
     }
 
-    private List<RecursiveAction> generateNextActions(NodeList list) {
+    private List<RecursiveAction> generateNextActions(Elements links) {
         List<RecursiveAction> actions = new ArrayList<RecursiveAction>();
-        for (int i = 0; i < list.size(); i++) {
-            LinkTag extracted = (LinkTag) list.elementAt(i);
+        for (int i = 0; i < links.size(); i++) {
+            Element element = links.get(i);
+            String href = element.attr("href");
+            if (!StringUtils.isEmpty(href) && !linkCrawlingState.visited(href)) {
 
-            if (!extracted.extractLink().isEmpty()
-                    && !linkCrawlingState.visited(extracted.extractLink())) {
-
-                actions.add(new PageProcessorRecursiveAction(this.pageDomTask, url, extracted.extractLink(), linkCrawlingState));
+                actions.add(new PageProcessorRecursiveAction(this.pageDomTask, url, href, linkCrawlingState));
             }
         }
         return actions;

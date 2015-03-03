@@ -8,5 +8,5 @@ package webcrawler.models.listeners;
  * To change this template use File | Settings | File Templates.
  */
 public interface NewLinkListener {
-    public void onNewLink(String fromLink, String toLink);
+    public void onNewLink(String fromLink, String toLink, String nodeName);
 }

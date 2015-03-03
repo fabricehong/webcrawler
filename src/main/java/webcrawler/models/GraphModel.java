@@ -33,7 +33,7 @@ public abstract class GraphModel implements NewLinkListener {
 
 
     @Override
-    public synchronized void onNewLink(String fromLink, String toLink) {
+    public synchronized void onNewLink(String fromLink, String toLink, String nodeName) {
         String fromKey = null;
         String toKey = null;
         try {
@@ -54,11 +54,11 @@ public abstract class GraphModel implements NewLinkListener {
         to = graphWrapper.getNode(toKey);
 
         if (from==null) {
-            from = graphWrapper.createNode(fromKey, extractNodeName(fromKey, fromLink));
+            from = graphWrapper.createNode(fromKey, nodeName);
             System.out.println("node '"+fromKey+"' created");
         }
         if (to==null) {
-            to = graphWrapper.createNode(toKey, extractNodeName(toKey, toLink));
+            to = graphWrapper.createNode(toKey, nodeName);
             System.out.println("node '"+toKey+"' created");
         }
 

@@ -33,10 +33,10 @@ public class LinkCrawlingState {
 
     }
 
-    public void newConnection(String fromLink, String toLink) {
+    public void newConnection(String fromLink, String toLink, String nodeName) {
         System.out.println("connection : " + fromLink + " - "  + toLink);
         for (NewLinkListener listener : newLinkListeners) {
-            listener.onNewLink(fromLink, toLink);
+            listener.onNewLink(fromLink, toLink, nodeName);
         }
     }
 
