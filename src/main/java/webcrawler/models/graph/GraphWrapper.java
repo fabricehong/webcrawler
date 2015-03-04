@@ -133,7 +133,7 @@ public class GraphWrapper {
         logger.debug(String.format("Node '%s' created", nodeDescription.getKey()));
 
         n.setString(NAME, nodeDescription.getName());
-        n.setBoolean("flag", false);
+        n.setBoolean("flag", true);
         strToId.put(nodeDescription.getKey(), n);
         return n;
     }

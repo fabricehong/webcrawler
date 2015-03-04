@@ -1,0 +1,2 @@
+- invoquer chaque RecursiveAction dans un thread séparé
+- faire en sorte que les noeuds se colorient en fonction du domaine

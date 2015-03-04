@@ -29,7 +29,7 @@ public class Webcrawler {
     }
 
     public void startCrawling() {
-        PageProcessorRecursiveAction start = new PageProcessorRecursiveAction(this.pageDomTasks, null, this.startURl, linkCrawlingState);
+        PageProcessorRecursiveAction start = new PageProcessorRecursiveAction(mainPool, this.pageDomTasks, null, this.startURl, linkCrawlingState);
         mainPool.invoke(start);
     }
 
