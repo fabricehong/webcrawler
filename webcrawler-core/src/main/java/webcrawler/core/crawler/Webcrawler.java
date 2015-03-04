@@ -63,7 +63,7 @@ public class Webcrawler {
     }
 
     public void stopCrawling() {
-        logger.info("shutting down");
+        logger.info(String.format("Collected %s links. shutting down", this.linkCrawlingState.size()));
         webCrawlingMainTask.shutdown();
 
     }

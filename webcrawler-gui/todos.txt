@@ -1,0 +1,3 @@
+- invoquer chaque RecursiveAction dans un thread séparé
+- faire en sorte que les noeuds se colorient en fonction du domaine
+- Dans la tache de lecture des pages, fermer le fichier après l'avoir ouvert

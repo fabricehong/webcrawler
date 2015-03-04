@@ -15,8 +15,19 @@ import java.net.MalformedURLException;
 public class PageNodeIdentifier implements NodeIdentifier {
     @Override
     public String extractNodeName(String url, PageDom pageDom) {
-        return pageDom.getPageTitle();
+        String pageTitle = pageDom.getPageTitle();
+        return shorten(pageTitle, 10);
     }
+
+    private String shorten(String string, int maxLen) {
+        if (string.length()<=maxLen) {
+            return string;
+        }
+        int half = maxLen/2;
+        int headStop = half-1;
+        return string.substring(0, half-1) + "..." + string.substring( string.length()-half+2, string.length());
+    }
+
 
     @Override
     public String extractNodeKey(String url) throws MalformedURLException {
