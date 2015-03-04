@@ -1,9 +1,11 @@
 package webcrawler.models.crawler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webcrawler.models.listeners.NewLinkListener;
+import webcrawler.models.parsing.PageDom;
 
 import java.util.*;
-import java.util.concurrent.ForkJoinPool;
 
 /**
  *
@@ -11,6 +13,7 @@ import java.util.concurrent.ForkJoinPool;
  */
 public class LinkCrawlingState {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Collection<String> visitedLinks = Collections.synchronizedSet(new HashSet<String>());
     private List<NewLinkListener> newLinkListeners;
@@ -19,28 +22,24 @@ public class LinkCrawlingState {
         this.newLinkListeners = new ArrayList<NewLinkListener>();
     }
 
-    public void queueLink(String link) throws Exception {
-        System.out.println("yo");
-    }
-
     public int size() {
         return visitedLinks.size();
     }
 
-    public void addVisited(String toLink) {
-        System.out.println("visited : " + toLink);
+    public void addVisited(String fromLink, String toLink, PageDom pageDom) {
+        logger.info("visited : " + toLink);
         visitedLinks.add(toLink);
-
+        newConnection(fromLink, toLink, pageDom);
     }
 
-    public void newConnection(String fromLink, String toLink, String nodeName) {
-        System.out.println("connection : " + fromLink + " - "  + toLink);
+    private void newConnection(String fromLink, String toLink, PageDom pageDom) {
+        logger.info("Creating connection : " + fromLink + " - " + toLink);
         for (NewLinkListener listener : newLinkListeners) {
-            listener.onNewLink(fromLink, toLink, nodeName);
+            listener.onVisitNewUrl(fromLink, toLink, pageDom);
         }
     }
 
-    public boolean visited(String s) {
+    public boolean isAlreadyVisited(String s) {
         return visitedLinks.contains(s);
     }
 

@@ -1,17 +1,23 @@
 package webcrawler.view;
 
-import webcrawler.models.GraphModel;
-import webcrawler.models.WebSiteModelImpl;
+import webcrawler.models.graph.GraphModel;
 import webcrawler.models.crawler.Webcrawler;
 import webcrawler.models.exceptions.TechnicalException;
+import webcrawler.models.graph.node.DomainNodeIdentifier;
+import webcrawler.models.graph.node.NodeColorizer;
+import webcrawler.models.graph.node.NodeIdentifier;
+import webcrawler.models.graph.node.PageNodeIdentifier;
 import webcrawler.models.tasks.LearnTextsTask;
 import webcrawler.models.tasks.PageDomTask;
 import webcrawler.view.prefuse.WebCrawlingView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -33,7 +39,6 @@ public class OpenUrlView extends JFrame {
     }
 
     private void initGUI() {
-
         Container contentPane = getContentPane();
 
         contentPane.setLayout(new FlowLayout());
@@ -74,18 +79,18 @@ public class OpenUrlView extends JFrame {
     }
 
     private void startCrawling() {
-        PageDomTask learnTextsTask = null;
+        List<PageDomTask> tasks;
         try {
-            learnTextsTask = new LearnTextsTask("/home/fabrice/log.log");
+            tasks = Arrays.asList(new PageDomTask[]{new LearnTextsTask("/home/fabrice/log.log")});
         } catch (IOException e) {
             throw new TechnicalException(e);
         }
-        webcrawler = new Webcrawler(learnTextsTask, textField.getText(), 4);
-        GraphModel graphModel = new WebSiteModelImpl(webcrawler);
+        webcrawler = new Webcrawler(tasks, textField.getText(), 4);
+//        NodeIdentifier nodeIdentifier = new DomainNodeIdentifier();
+        NodeIdentifier nodeIdentifier = new PageNodeIdentifier();
+        NodeColorizer nodeColorizer = new NodeColorizer();
+        GraphModel graphModel = new GraphModel(webcrawler, nodeColorizer, nodeIdentifier);
         new WebCrawlingView(graphModel, webcrawler);
-
-
-
 
         webcrawler.startCrawling();
     }

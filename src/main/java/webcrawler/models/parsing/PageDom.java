@@ -4,8 +4,10 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import webcrawler.models.exceptions.CannotVisitPageException;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -19,9 +21,14 @@ public class PageDom {
 
     private final Document doc;
 
-    public PageDom(String url) throws IOException {
-        URL uriLink = new URL(url);
-        doc = Jsoup.parse(uriLink, 5000);
+    public PageDom(String url) throws CannotVisitPageException {
+        try {
+            URL uriLink = new URL(url);
+            doc = Jsoup.parse(uriLink, 5000);
+
+        } catch (Throwable e) {
+            throw new CannotVisitPageException(String.format("Cannot visit url '%s'", url), e);
+        }
     }
 
 

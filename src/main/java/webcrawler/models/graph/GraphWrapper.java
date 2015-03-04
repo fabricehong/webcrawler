@@ -1,13 +1,19 @@
-package webcrawler.models;
+package webcrawler.models.graph;
 
+import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import prefuse.data.Edge;
 import prefuse.data.Graph;
 import prefuse.data.Node;
 import prefuse.data.Table;
-import webcrawler.models.exceptions.NodeDoesntExists;
+import webcrawler.models.exceptions.TechnicalException;
+import webcrawler.models.graph.node.NodeDescription;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,15 +24,34 @@ import java.util.Map;
  */
 public class GraphWrapper {
 
-
     public static final String NAME = "name";
     private Graph graph;
     private Map<String, Node> strToId;
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     public GraphWrapper() {
-        this.strToId = new HashMap<String, Node>();
+        this.strToId = new HashMap<>();
         this.graph = makeGraph();
-        createNode("start", "start");
+//        createNode("http://www.javaworld.co", "http://www.javaworld.com");
+    }
+
+    public boolean connectAndCreateIfNeeded(String originNodeKey, NodeDescription newNodeDescription) {
+        Node from = getNode(originNodeKey);
+        Node to = getNode(newNodeDescription.getKey());
+
+        checkNotNull(from, String.format("Origin node for new node key '%s' should already exist. Origin node key : %s", newNodeDescription.getKey(), originNodeKey));
+
+        if (to==null) {
+            to = createNode(newNodeDescription);
+        }
+
+        if (!alreadyConnected(from, to)) {
+            connect(from, to);
+            logger.debug("connects '"+originNodeKey+"' to '"+newNodeDescription.getKey()+"'");
+            return true;
+        }
+        logger.debug("'" + originNodeKey + "' and '" + newNodeDescription.getKey() + "' are already connected");
+        return false;
     }
 
     private Graph makeGraph() {
@@ -45,7 +70,6 @@ public class GraphWrapper {
         // Create Graph backed by those tables.  Note that I'm
         // creating a directed graph here also.
         Graph g = new Graph(nodeData, edgeData, true);
-
         return g;
     }
 
@@ -76,14 +100,13 @@ public class GraphWrapper {
         e4.setString("label", "b");
         e5.setString("label", "b");
         e6.setString("label", "b");
-
     }
 
     public Graph getGraph() {
         return graph;
     }
 
-    public boolean alreadyConnected(Node key1, Node key2) {
+    private boolean alreadyConnected(Node key1, Node key2) {
         try {
             Edge edge = graph.getEdge(key1, key2);
             return edge!=null;
@@ -92,22 +115,26 @@ public class GraphWrapper {
         }
     }
 
-    public void connect(Node node1, Node node2) {
+    private void connect(Node node1, Node node2) {
         Edge edge = graph.addEdge(node1, node2);
         edge.setString("label", "a");
-
     }
 
-    public Node getNode(String key) {
+    private Node getNode(String key) {
         Node aInt = strToId.get(key);
         return aInt;
     }
 
-    public Node createNode(String key, String name) {
+    public Node createNode(NodeDescription nodeDescription) {
+        if (getNode(nodeDescription.getKey())!=null) {
+            throw new TechnicalException("Cannot create node. Node already exists");
+        }
         Node n = graph.addNode();
-        n.setString(NAME, name);
+        logger.debug(String.format("Node '%s' created", nodeDescription.getKey()));
+
+        n.setString(NAME, nodeDescription.getName());
         n.setBoolean("flag", false);
-        strToId.put(key, n);
+        strToId.put(nodeDescription.getKey(), n);
         return n;
     }
 }

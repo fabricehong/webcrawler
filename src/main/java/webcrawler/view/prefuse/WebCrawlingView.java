@@ -1,6 +1,6 @@
 package webcrawler.view.prefuse;
 
-import webcrawler.models.GraphModel;
+import webcrawler.models.graph.GraphModel;
 import webcrawler.models.crawler.Webcrawler;
 import webcrawler.models.listeners.GraphEventListener;
 

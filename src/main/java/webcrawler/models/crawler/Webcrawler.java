@@ -1,8 +1,11 @@
 package webcrawler.models.crawler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webcrawler.models.listeners.NewLinkListener;
 import webcrawler.models.tasks.PageDomTask;
 
+import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 
 /**
@@ -11,23 +14,22 @@ import java.util.concurrent.ForkJoinPool;
  */
 public class Webcrawler {
 
-
-    public static final String START_URL = "start";
+    private Logger logger = LoggerFactory.getLogger(getClass());
     private String startURl;
     private ForkJoinPool mainPool;
     private LinkCrawlingState linkCrawlingState;
-    private PageDomTask pageDomTask;
+    private List<PageDomTask> pageDomTasks;
 
 
-    public Webcrawler(PageDomTask pageDomTask, String startUrl, int maxThreads) {
-        this.pageDomTask = pageDomTask;
+    public Webcrawler(List<PageDomTask> pageDomTasks, String startUrl, int maxThreads) {
+        this.pageDomTasks = pageDomTasks;
         this.startURl = startUrl;
         mainPool = new ForkJoinPool(maxThreads);
         linkCrawlingState = new LinkCrawlingState();
     }
 
     public void startCrawling() {
-        PageProcessorRecursiveAction start = new PageProcessorRecursiveAction(pageDomTask, START_URL, this.startURl, linkCrawlingState);
+        PageProcessorRecursiveAction start = new PageProcessorRecursiveAction(this.pageDomTasks, null, this.startURl, linkCrawlingState);
         mainPool.invoke(start);
     }
 
@@ -36,7 +38,7 @@ public class Webcrawler {
     }
 
     public void stopCrawling() {
-        System.out.println("shutting down");
+        logger.info("shutting down");
         mainPool.shutdownNow();
 
     }

@@ -96,9 +96,6 @@ public class PrefuseGraphDisplay extends Display {
 
         m_vis.run(COLOR_ACTION);
         m_vis.run(LAYOUT_ACTION);
-
-
-
     }
 
     public Graph getGraph() {
