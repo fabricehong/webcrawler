@@ -31,7 +31,6 @@ import static org.mockito.MockitoAnnotations.initMocks;
  */
 public class VisitUrlTaskTest {
 
-
     @Mock
     private WebCrawlingMainTask webCrawlingMainTask;
 
@@ -73,21 +72,6 @@ public class VisitUrlTaskTest {
 
     }
 
-    private void assertVisitedLinksCountEquals(int number) {
-        int linkCollectionSize = retrieveVisitedLinksCount();
-        assertThat(linkCollectionSize, equalTo(number));
-    }
-
-    private int retrieveVisitedLinksCount() {
-        return this.linkCrawlingState.getLinkCollectionSize();
-    }
-
-    private List<Collection> retrieveSubmittedTasks() {
-        ArgumentCaptor<Collection> captor = ArgumentCaptor.forClass(Collection.class);
-        Mockito.verify(this.webCrawlingMainTask).submitAllTasks(captor.capture());
-        return captor.getAllValues();
-    }
-
     private PageVisitTester createVisitTask(String fromUrl, String urlToExplore) {
         PageVisitTester pageVisitTester = null;
         try {
@@ -98,6 +82,17 @@ public class VisitUrlTaskTest {
         VisitUrlTask visitUrlTask = new VisitUrlTask(webCrawlingMainTask, pageVisitTester.getPageDomTasks(), pageVisitTester.getPageParser(), fromUrl, urlToExplore, linkCrawlingState);
         pageVisitTester.setVisitUrlTask(visitUrlTask);
         return pageVisitTester;
+    }
+
+    private void assertVisitedLinksCountEquals(int number) {
+        int linkCollectionSize = this.linkCrawlingState.getLinkCollectionSize();
+        assertThat(linkCollectionSize, equalTo(number));
+    }
+
+    private List<Collection> retrieveSubmittedTasks() {
+        ArgumentCaptor<Collection> captor = ArgumentCaptor.forClass(Collection.class);
+        Mockito.verify(this.webCrawlingMainTask).submitAllTasks(captor.capture());
+        return captor.getAllValues();
     }
 
 
