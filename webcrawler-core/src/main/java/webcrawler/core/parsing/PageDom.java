@@ -20,14 +20,8 @@ public class PageDom {
     public static final String URL_PROP = "URL=";
     private final Document doc;
 
-    public PageDom(String url) throws CannotVisitPageException {
-        try {
-            URL uriLink = new URL(url);
-            doc = Jsoup.parse(uriLink, 5000);
-
-        } catch (Throwable e) {
-            throw new CannotVisitPageException(String.format("Cannot visit url '%s'", url), e);
-        }
+    public PageDom(Document doc) {
+        this.doc = doc;
     }
 
 

@@ -8,6 +8,8 @@ package webcrawler.gui.view.prefuse;
  * To change this template use File | Settings | File Templates.
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import prefuse.Constants;
 import prefuse.Display;
 import prefuse.Visualization;
@@ -21,6 +23,9 @@ import prefuse.controls.DragControl;
 import prefuse.controls.PanControl;
 import prefuse.controls.ZoomControl;
 import prefuse.data.Graph;
+import prefuse.data.Tuple;
+import prefuse.data.event.TupleSetListener;
+import prefuse.data.tuple.TupleSet;
 import prefuse.render.*;
 import prefuse.util.ColorLib;
 import prefuse.visual.VisualItem;
@@ -30,7 +35,7 @@ public class PrefuseGraphDisplay extends Display {
     public static final String COLOR_ACTION = "color";
     private final Graph graph;
     private static final String LAYOUT_ACTION = "layout";
-
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
 
     public PrefuseGraphDisplay(Graph graph) {
@@ -43,7 +48,13 @@ public class PrefuseGraphDisplay extends Display {
 //        m_vis.setValue("graph.nodes", null, VisualItem.SHAPE,
 //                new Integer(Constants.SHAPE_ELLIPSE));
 
-
+        TupleSet focusGroup = m_vis.getGroup(Visualization.FOCUS_ITEMS);
+        focusGroup.addTupleSetListener(new TupleSetListener() {
+            public void tupleSetChanged(TupleSet ts, Tuple[] add, Tuple[] rem)
+            {
+                logger.debug(String.format("Tuple changed : ts=%s, add=%s, rem=%s", ts.getTupleCount(), add.length, rem.length));
+            }
+        });
 
         LabelRenderer nodeR = new LabelRenderer("name");
         nodeR.setRoundedCorner(8, 8);

@@ -17,34 +17,43 @@ public class LinkCrawlingState {
 
     private final Collection<String> visitedLinks = Collections.synchronizedSet(new HashSet<String>());
     private List<NewLinkListener> newLinkListeners;
+    private long linkAlreadyVisited;
 
     public LinkCrawlingState() {
+        this.linkAlreadyVisited = 0;
         this.newLinkListeners = new ArrayList<NewLinkListener>();
     }
 
-    public int size() {
+    public synchronized int getLinkCollectionSize() {
         return visitedLinks.size();
     }
 
-    public void addVisited(String fromLink, String toLink, PageDom pageDom) {
-        logger.info("visited : " + toLink);
+    public synchronized void addVisited(String fromLink, String toLink, PageDom pageDom) {
+        logger.debug("visited : " + toLink);
         visitedLinks.add(toLink);
         newConnection(fromLink, toLink, pageDom);
     }
 
     private void newConnection(String fromLink, String toLink, PageDom pageDom) {
-        logger.info("Creating connection : " + fromLink + " - " + toLink);
+        logger.debug("Creating connection : " + fromLink + " - " + toLink);
         for (NewLinkListener listener : newLinkListeners) {
             listener.onVisitNewUrl(fromLink, toLink, pageDom);
         }
     }
 
-    public boolean isAlreadyVisited(String s) {
-        return visitedLinks.contains(s);
+    public synchronized boolean isAlreadyVisited(String s) {
+        boolean contains = visitedLinks.contains(s);
+        if (contains) {
+            linkAlreadyVisited++;
+        }
+        return contains;
     }
 
     public void addNewLinkListener(NewLinkListener listener) {
         this.newLinkListeners.add(listener);
     }
 
+    public long getLinkAlreadyVisited() {
+        return linkAlreadyVisited;
+    }
 }

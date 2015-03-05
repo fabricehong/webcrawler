@@ -3,6 +3,7 @@ package webcrawler.core.crawler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webcrawler.core.listeners.NewLinkListener;
+import webcrawler.core.parsing.PageParser;
 import webcrawler.core.tasks.PageDomTask;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -54,7 +55,7 @@ public class Webcrawler {
     }
 
     public void startCrawling() {
-        VisitUrlTask start = new VisitUrlTask(webCrawlingMainTask, this.pageDomTasks, null, this.startURl, linkCrawlingState);
+        VisitUrlTask start = new VisitUrlTask(webCrawlingMainTask, this.pageDomTasks, new PageParser(), null, this.startURl, linkCrawlingState);
         webCrawlingMainTask.submitTask(start);
     }
 
@@ -63,8 +64,16 @@ public class Webcrawler {
     }
 
     public void stopCrawling() {
-        logger.info(String.format("Collected %s links. shutting down", this.linkCrawlingState.size()));
+        logger.info(String.format("Collected %s links. shutting down", this.linkCrawlingState.getLinkCollectionSize()));
         webCrawlingMainTask.shutdown();
 
+    }
+
+    public LinkCrawlingState getLinkCrawlingState() {
+        return linkCrawlingState;
+    }
+
+    public WebCrawlingMainTask getWebCrawlingMainTask() {
+        return webCrawlingMainTask;
     }
 }

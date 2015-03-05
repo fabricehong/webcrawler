@@ -6,6 +6,7 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webcrawler.core.parsing.PageDom;
+import webcrawler.core.parsing.PageParser;
 import webcrawler.core.tasks.PageDomTask;
 import webcrawler.core.url.UrlUtils;
 
@@ -20,6 +21,7 @@ import java.util.concurrent.*;
  */
 public class VisitUrlTask implements Callable<Void> {
 
+    public static final int MAX_LINKS = 300;
     private Logger logger = LoggerFactory.getLogger(VisitUrlTask.class);
     private String urlToExplore;
     private LinkCrawlingState linkCrawlingState;
@@ -27,20 +29,29 @@ public class VisitUrlTask implements Callable<Void> {
     /**
      * Used for statistics
      */
-    private static final long t0 = System.nanoTime();
+    private static final long t0 = System.currentTimeMillis();
     private List<PageDomTask> pageDomTasks;
-    private WebCrawlingMainTask executorService;
+    private WebCrawlingMainTask webCrawlingMainTask;
 
-    public VisitUrlTask(WebCrawlingMainTask webCrawlingMainTask, List<PageDomTask> pageDomTasks, String fromUrl, String urlToExplore, LinkCrawlingState linkCrawlingState) {
+    private PageParser pageParser;
+
+    public VisitUrlTask(WebCrawlingMainTask webCrawlingMainTask, List<PageDomTask> pageDomTasks, PageParser pageParser, String fromUrl, String urlToExplore, LinkCrawlingState linkCrawlingState) {
         this.fromUrl = fromUrl;
         this.urlToExplore = urlToExplore;
         this.linkCrawlingState = linkCrawlingState;
         this.pageDomTasks = pageDomTasks;
-        this.executorService = webCrawlingMainTask;
+        this.pageParser = pageParser;
+        this.webCrawlingMainTask = webCrawlingMainTask;
     }
 
     @Override
     public Void call() throws Exception {
+        if (linkCrawlingState.getLinkCollectionSize() > MAX_LINKS) {
+            this.logger.info(String.format("Time for visit %s distinct links=%s s", MAX_LINKS, ((System.currentTimeMillis() - t0)/1000)));
+            this.webCrawlingMainTask.shutdown();
+            return null;
+        }
+
         this.logger.debug(String.format("Thread '%s' visiting url '%s'. from url : %s", this, urlToExplore, fromUrl));
         String normalizedUrl = null;
         try {
@@ -49,9 +60,9 @@ public class VisitUrlTask implements Callable<Void> {
             this.logger.debug(String.format("Not an url (ignoring): %s", this.urlToExplore));
             return null;
         }
-        if (!linkCrawlingState.isAlreadyVisited(normalizedUrl)) {
+        if (!isAlreadyVisited(normalizedUrl)) {
             try {
-                PageDom pageDom = new PageDom(normalizedUrl);
+                PageDom pageDom = pageParser.parsePage(normalizedUrl);
 
                 linkCrawlingState.addVisited(fromUrl, normalizedUrl, pageDom);
 
@@ -60,7 +71,7 @@ public class VisitUrlTask implements Callable<Void> {
                     this.logger.debug(String.format("Found redirection : %s", redirection));
                     String normalizedRedirectionUrl = computeUrl(fromUrl, redirection);
                     VisitUrlTask visitUrlTask = generateNextAction(fromUrl, normalizedRedirectionUrl);
-                    this.executorService.submitTask(visitUrlTask);
+                    this.webCrawlingMainTask.submitTask(visitUrlTask);
                     return null;
                 }
 
@@ -72,12 +83,9 @@ public class VisitUrlTask implements Callable<Void> {
                 this.logger.debug(String.format("Found %s links in this page", links.size()));
                 final List<VisitUrlTask> actions = generateNextActions(normalizedUrl, links);
 
-                if (linkCrawlingState.size() > 1500) {
-                    this.logger.info("Time for visit 1500 distinct links= " + (System.nanoTime() - t0));
-                    this.executorService.shutdown();
-                }
+
                 //invoke recursively
-                executorService.submitAllTasks(actions);
+                webCrawlingMainTask.submitAllTasks(actions);
                 // invokeRecursively(actions); crée un graph bizarre
 
             } catch (Exception e) {
@@ -86,6 +94,10 @@ public class VisitUrlTask implements Callable<Void> {
             }
         }
         return null;
+    }
+
+    private boolean isAlreadyVisited(String normalizedUrl) {
+        return linkCrawlingState.isAlreadyVisited(normalizedUrl);
     }
 
     private String computeUrl(String fromUrl, String urlToExplore) throws MalformedURLException {
@@ -119,8 +131,8 @@ public class VisitUrlTask implements Callable<Void> {
     }
 
     private VisitUrlTask generateNextAction(String originalUrl, String linkUrl) {
-        if (!StringUtils.isEmpty(linkUrl) && !linkCrawlingState.isAlreadyVisited(linkUrl)) {
-            return new VisitUrlTask(this.executorService, this.pageDomTasks, originalUrl, linkUrl, linkCrawlingState);
+        if (!StringUtils.isEmpty(linkUrl) && !isAlreadyVisited(linkUrl)) {
+            return new VisitUrlTask(this.webCrawlingMainTask, this.pageDomTasks, this.pageParser, originalUrl, linkUrl, linkCrawlingState);
         }
         return null;
     }

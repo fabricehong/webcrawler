@@ -40,6 +40,37 @@ public class NodeColorizer {
         return nodeColor;
     }
 
+    public String generateTable() {
+        String fabrice = "Fabrice";
+        Color colorFabrice = generateNewColor(fabrice);
+        String fabien = "Fadrdbiesn";
+        Color colorFabien = generateNewColor(fabien);
+        System.out.println(String.format("fabrice : %s", colorFabrice));
+        System.out.println(String.format("fabien : %s", colorFabien));
+        String nicolas = "Nicolas";
+        Color colorNicolas = generateNewColor(nicolas);
+        String nicolier = "Nicolier";
+        Color colorNicolier = generateNewColor(nicolier);
+        String s = "<table>" +
+                "<tr><td style='background-color: rgb(%s,%s,%s);'>%s</td></tr>" +
+                "<tr><td style='background-color: rgb(%s,%s,%s);'>%s</td></tr>" +
+                "<tr><td style='background-color: rgb(%s,%s,%s);'>%s</td></tr>" +
+                "<tr><td style='background-color: rgb(%s,%s,%s);'>%s</td></tr>" +
+                "</table>";
+        s = String.format(s,
+                colorFabrice.getRed(), colorFabrice.getGreen(), colorFabrice.getBlue(), fabrice,
+                colorFabien.getRed(), colorFabien.getGreen(), colorFabien.getBlue(), fabien,
+                colorNicolas.getRed(), colorNicolas.getGreen(), colorNicolas.getBlue(), nicolas,
+                colorNicolier.getRed(), colorNicolier.getGreen(), colorNicolier.getBlue(), nicolier
+                );
+        return s;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(new NodeColorizer().generateTable());
+
+    }
+
     private Color generateNewColor(String colorKey) {
         int mean = castStringToInt(colorKey, 255);
         int offset = 255 / 3;
