@@ -21,7 +21,7 @@ import java.util.concurrent.*;
  */
 public class VisitUrlTask implements Callable<Void> {
 
-    public static final int MAX_LINKS = 300;
+    public static final int MAX_LINKS = 1000;
     private Logger logger = LoggerFactory.getLogger(VisitUrlTask.class);
     private String urlToExplore;
     private LinkCrawlingState linkCrawlingState;

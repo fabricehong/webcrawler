@@ -1,3 +1,6 @@
 - invoquer chaque RecursiveAction dans un thread séparé
 - faire en sorte que les noeuds se colorient en fonction du domaine
 - Dans la tache de lecture des pages, fermer le fichier après l'avoir ouvert
+- mettre les requettes sur les memes sites en dernier. sinon rapidement je vais tomber dans la black list du site.
+- ajouter des stats sur nombre de requetes a la seconde
+- ajouter stats sur nombre de requete a la seconde max sur un site et lequel
