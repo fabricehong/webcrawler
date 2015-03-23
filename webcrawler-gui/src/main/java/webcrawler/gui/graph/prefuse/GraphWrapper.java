@@ -11,6 +11,7 @@ import webcrawler.gui.graph.node.NodeDescription;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -29,6 +30,7 @@ public class GraphWrapper {
     private Graph graph;
     private Map<String, Node> strToId;
     private Logger logger = LoggerFactory.getLogger(getClass());
+    private Random rand = new Random(System.currentTimeMillis());
 
     public GraphWrapper() {
         this.strToId = new HashMap<>();

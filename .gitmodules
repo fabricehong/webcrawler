@@ -1,0 +1,3 @@
+[submodule "Prefuse"]
+	path = Prefuse
+	url = https://github.com/gratteur/Prefuse.git

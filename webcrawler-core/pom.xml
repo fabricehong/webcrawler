@@ -39,9 +39,13 @@
 
         <!-- graphic -->
         <dependency>
-            <groupId>org.prefuse</groupId>
+            <groupId>prefuse</groupId>
             <artifactId>prefuse</artifactId>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.prefuse</groupId>-->
+            <!--<artifactId>prefuse</artifactId>-->
+        <!--</dependency>-->
 
         <!-- parser -->
         <dependency>

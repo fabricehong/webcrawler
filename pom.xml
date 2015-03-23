@@ -15,5 +15,6 @@
         <module>webcrawler-core</module>
         <module>webcrawler-my</module>
         <module>webcrawler-gui</module>
+        <module>Prefuse</module>
     </modules>
 </project>
