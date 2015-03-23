@@ -34,6 +34,9 @@ import webcrawler.gui.graph.prefuse.GraphWrapper;
 public class PrefuseGraphDisplay extends Display {
 
     public static final String COLOR_ACTION = "color";
+    public static final String GRAPH_ID = "graph";
+    public static final String EDGES_ID = GRAPH_ID + ".edges";
+    public static final String NODES_ID = GRAPH_ID + ".nodes";
     private final Graph graph;
     private static final String LAYOUT_ACTION = "layout";
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -44,8 +47,8 @@ public class PrefuseGraphDisplay extends Display {
         super(new Visualization());
         this.graph = graph;
 
-        m_vis.addGraph("graph", graph);
-        m_vis.setInteractive("graph.edges", null, false);
+        m_vis.addGraph(GRAPH_ID, graph);
+        m_vis.setInteractive(EDGES_ID, null, false);
 //        m_vis.setValue("graph.nodes", null, VisualItem.SHAPE,
 //                new Integer(Constants.SHAPE_ELLIPSE));
 
@@ -84,7 +87,7 @@ public class PrefuseGraphDisplay extends Display {
 
     private void setupLayoutAction() {
         ActionList layout = new ActionList(Activity.INFINITY);
-        layout.add(new ForceDirectedLayout("graph"));
+        layout.add(new ForceDirectedLayout(GRAPH_ID));
         layout.add(new RepaintAction());
 
         m_vis.putAction(LAYOUT_ACTION, layout);
@@ -96,22 +99,23 @@ public class PrefuseGraphDisplay extends Display {
         int[] palette = new int[] {
                 ColorLib.rgb(255, 180, 180), ColorLib.rgb(190,190,255)
         };
-        DataColorAction nFill = new DataColorAction("graph.nodes", GraphWrapper.COLOR_FLAG,
+        DataColorAction nodeFill = new DataColorAction(NODES_ID, GraphWrapper.COLOR_FLAG,
                 Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
 
-        ColorAction nStroke = new ColorAction("graph.nodes", VisualItem.STROKECOLOR);
-        nStroke.setDefaultColor(graphDisplaySettings.getNodeBorderColor());
+        ColorAction nodeBorder = new ColorAction(NODES_ID, VisualItem.STROKECOLOR);
+        nodeBorder.setDefaultColor(graphDisplaySettings.getNodeBorderColor());
 
-        ColorAction edges = new ColorAction("graph.edges",
+        ColorAction edges = new ColorAction(EDGES_ID,
                 VisualItem.STROKECOLOR, graphDisplaySettings.getEdgeColor());
 
-        ColorAction textColor =  new ColorAction("graph.nodes", VisualItem.TEXTCOLOR, graphDisplaySettings.getNodeTextColor());
+        ColorAction textColor =  new ColorAction(NODES_ID, VisualItem.TEXTCOLOR, graphDisplaySettings.getNodeTextColor());
 
-        ColorAction arrow = new ColorAction("graph.edges",
+        ColorAction arrow = new ColorAction(EDGES_ID,
                 VisualItem.FILLCOLOR, graphDisplaySettings.getNodeBackgroundColor());
+
         ActionList color = new ActionList();
-        color.add(nStroke);
-        color.add(nFill);
+        color.add(nodeBorder);
+        color.add(nodeFill);
         color.add(edges);
         color.add(arrow);
         color.add(textColor);
@@ -125,7 +129,7 @@ public class PrefuseGraphDisplay extends Display {
     }
 
     public void updateVisualization() {
-        m_vis.setValue("graph.nodes", null, VisualItem.SHAPE,
+        m_vis.setValue(NODES_ID, null, VisualItem.SHAPE,
                 new Integer(Constants.SHAPE_ELLIPSE));
         m_vis.run(COLOR_ACTION);
     }
