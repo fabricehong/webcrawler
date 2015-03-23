@@ -29,6 +29,7 @@ import prefuse.data.tuple.TupleSet;
 import prefuse.render.*;
 import prefuse.util.ColorLib;
 import prefuse.visual.VisualItem;
+import webcrawler.gui.graph.prefuse.GraphWrapper;
 
 public class PrefuseGraphDisplay extends Display {
 
@@ -38,7 +39,7 @@ public class PrefuseGraphDisplay extends Display {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
 
-    public PrefuseGraphDisplay(Graph graph) {
+    public PrefuseGraphDisplay(Graph graph, GraphDisplaySettings graphDisplaySettings) {
 
         super(new Visualization());
         this.graph = graph;
@@ -56,43 +57,11 @@ public class PrefuseGraphDisplay extends Display {
             }
         });
 
-        LabelRenderer nodeR = new LabelRenderer("name");
-        nodeR.setRoundedCorner(8, 8);
-        EdgeRenderer edgeR = new EdgeRenderer(prefuse.Constants.EDGE_TYPE_CURVE, prefuse.Constants.EDGE_ARROW_FORWARD);
+        setupGraphRenderers();
 
-        DefaultRendererFactory drf = new DefaultRendererFactory();
-        drf.setDefaultRenderer(nodeR);
-        drf.setDefaultEdgeRenderer(edgeR);
-        m_vis.setRendererFactory(drf);
+        setupColorActions(graphDisplaySettings);
 
-        int[] palette = new int[] {
-                ColorLib.rgb(255,180,180), ColorLib.rgb(190,190,255)
-        };
-        ColorAction nStroke = new ColorAction("graph.nodes", VisualItem.STROKECOLOR);
-        nStroke.setDefaultColor(ColorLib.gray(100));
-
-        DataColorAction nFill = new DataColorAction("graph.nodes", "flag",
-                Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
-        ColorAction edges = new ColorAction("graph.edges",
-                VisualItem.STROKECOLOR, ColorLib.gray(200));
-
-        ColorAction textColor =  new ColorAction("graph.nodes", VisualItem.TEXTCOLOR, ColorLib.rgb(0,0,0));
-
-        ColorAction arrow = new ColorAction("graph.edges",
-                VisualItem.FILLCOLOR, ColorLib.gray(200));
-        ActionList color = new ActionList();
-        color.add(nStroke);
-        color.add(nFill);
-        color.add(edges);
-        color.add(arrow);
-        color.add(textColor);
-
-        ActionList layout = new ActionList(Activity.INFINITY);
-        layout.add(new ForceDirectedLayout("graph"));
-        layout.add(new RepaintAction());
-
-        m_vis.putAction(COLOR_ACTION, color);
-        m_vis.putAction(LAYOUT_ACTION, layout);
+        setupLayoutAction();
 
         setSize(720, 500); // set display size
         pan(360, 250);
@@ -100,9 +69,55 @@ public class PrefuseGraphDisplay extends Display {
         addControlListener(new DragControl());
         addControlListener(new PanControl());
         addControlListener(new ZoomControl());
+    }
 
-        m_vis.run(COLOR_ACTION);
+    private void setupGraphRenderers() {
+        LabelRenderer nodeR = new LabelRenderer(GraphWrapper.NAME);
+        nodeR.setRoundedCorner(8, 8);
+        EdgeRenderer edgeR = new EdgeRenderer(Constants.EDGE_TYPE_CURVE, Constants.EDGE_ARROW_FORWARD);
+
+        DefaultRendererFactory drf = new DefaultRendererFactory();
+        drf.setDefaultRenderer(nodeR);
+        drf.setDefaultEdgeRenderer(edgeR);
+        m_vis.setRendererFactory(drf);
+    }
+
+    private void setupLayoutAction() {
+        ActionList layout = new ActionList(Activity.INFINITY);
+        layout.add(new ForceDirectedLayout("graph"));
+        layout.add(new RepaintAction());
+
+        m_vis.putAction(LAYOUT_ACTION, layout);
         m_vis.run(LAYOUT_ACTION);
+    }
+
+    private void setupColorActions(GraphDisplaySettings graphDisplaySettings) {
+        // list of colors
+        int[] palette = new int[] {
+                ColorLib.rgb(255, 180, 180), ColorLib.rgb(190,190,255)
+        };
+        DataColorAction nFill = new DataColorAction("graph.nodes", GraphWrapper.COLOR_FLAG,
+                Constants.NOMINAL, VisualItem.FILLCOLOR, palette);
+
+        ColorAction nStroke = new ColorAction("graph.nodes", VisualItem.STROKECOLOR);
+        nStroke.setDefaultColor(graphDisplaySettings.getNodeBorderColor());
+
+        ColorAction edges = new ColorAction("graph.edges",
+                VisualItem.STROKECOLOR, graphDisplaySettings.getEdgeColor());
+
+        ColorAction textColor =  new ColorAction("graph.nodes", VisualItem.TEXTCOLOR, graphDisplaySettings.getNodeTextColor());
+
+        ColorAction arrow = new ColorAction("graph.edges",
+                VisualItem.FILLCOLOR, graphDisplaySettings.getNodeBackgroundColor());
+        ActionList color = new ActionList();
+        color.add(nStroke);
+        color.add(nFill);
+        color.add(edges);
+        color.add(arrow);
+        color.add(textColor);
+        m_vis.putAction(COLOR_ACTION, color);
+        m_vis.run(COLOR_ACTION);
+
     }
 
     public Graph getGraph() {

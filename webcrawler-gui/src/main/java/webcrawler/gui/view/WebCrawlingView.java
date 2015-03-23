@@ -3,6 +3,7 @@ package webcrawler.gui.view;
 import webcrawler.gui.graph.GraphModel;
 import webcrawler.core.crawler.Webcrawler;
 import webcrawler.gui.graph.listeners.GraphEventListener;
+import webcrawler.gui.view.prefuse.GraphDisplaySettings;
 import webcrawler.gui.view.prefuse.PrefuseGraphDisplay;
 
 import javax.swing.*;
@@ -51,7 +52,7 @@ public class WebCrawlingView extends JFrame implements GraphEventListener {
         contentPane.setLayout(new FlowLayout());
 
 
-        prefuseGraphDisplay = new PrefuseGraphDisplay(model.getGraph());
+        prefuseGraphDisplay = new PrefuseGraphDisplay(model.getGraph(), new GraphDisplaySettings());
         contentPane.add(prefuseGraphDisplay);
         JPanel stats = new JPanel();
         stats.setLayout(new BoxLayout(stats, BoxLayout.PAGE_AXIS));

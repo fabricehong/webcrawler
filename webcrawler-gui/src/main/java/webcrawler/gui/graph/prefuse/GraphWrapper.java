@@ -24,6 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class GraphWrapper {
 
     public static final String NAME = "name";
+    public static final String COLOR_FLAG = "flag";
+    public static final String LABEL = "label";
     private Graph graph;
     private Map<String, Node> strToId;
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -58,11 +60,11 @@ public class GraphWrapper {
         // Create tables for node and edge data, and configure their columns.
         Table nodeData = new Table();
         Table edgeData = new Table(0,1);
-        nodeData.addColumn("flag", boolean.class);
+        nodeData.addColumn(COLOR_FLAG, boolean.class);
         nodeData.addColumn(NAME, String.class);
         edgeData.addColumn(Graph.DEFAULT_SOURCE_KEY, int.class);
         edgeData.addColumn(Graph.DEFAULT_TARGET_KEY, int.class);
-        edgeData.addColumn("label", String.class);
+        edgeData.addColumn(LABEL, String.class);
         // Need more data in your nodes or edges?  Just add more
         // columns.
 
@@ -80,25 +82,25 @@ public class GraphWrapper {
             Node n1 = graph.addNode();
             Node n2 = graph.addNode();
             Node n3 = graph.addNode();
-            n1.setBoolean("flag", false);
-            n2.setBoolean("flag", true);
-            n3.setBoolean("flag", true);
+            n1.setBoolean(COLOR_FLAG, false);
+            n2.setBoolean(COLOR_FLAG, true);
+            n3.setBoolean(COLOR_FLAG, true);
             n1.setString(NAME, "asdasd1");
             n2.setString(NAME, "2");
             n3.setString(NAME, "3");
             Edge e1 = graph.addEdge(n1, n2);
             Edge e2 = graph.addEdge(n1, n3);
             Edge e3 = graph.addEdge(n2, n3);
-            e1.setString("label", "a");
-            e2.setString("label", "a");
-            e3.setString("label", "a");
+            e1.setString(LABEL, "a");
+            e2.setString(LABEL, "a");
+            e3.setString(LABEL, "a");
         }
         Edge e4 = graph.getEdge(graph.addEdge(0, 3));
         Edge e5 = graph.getEdge(graph.addEdge(3, 6));
         Edge e6 = graph.getEdge(graph.addEdge(6, 0));
-        e4.setString("label", "b");
-        e5.setString("label", "b");
-        e6.setString("label", "b");
+        e4.setString(LABEL, "b");
+        e5.setString(LABEL, "b");
+        e6.setString(LABEL, "b");
     }
 
     public Graph getGraph() {
@@ -116,7 +118,7 @@ public class GraphWrapper {
 
     private void connect(Node node1, Node node2) {
         Edge edge = graph.addEdge(node1, node2);
-        edge.setString("label", "a");
+        edge.setString(LABEL, "a");
     }
 
     private Node getNode(String key) {
@@ -132,7 +134,7 @@ public class GraphWrapper {
         logger.debug(String.format("Node '%s' created", nodeDescription.getKey()));
 
         n.setString(NAME, nodeDescription.getName());
-        n.setBoolean("flag", true);
+        n.setBoolean(COLOR_FLAG, true);
         strToId.put(nodeDescription.getKey(), n);
         return n;
     }
