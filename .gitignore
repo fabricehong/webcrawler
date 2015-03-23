@@ -1,0 +1,14 @@
+target
+*.iml
+*.ipr
+*.iws
+tmp
+lib
+test-result
+precompiled
+modules
+logs
+server.pid
+.idea
+out
+*~
